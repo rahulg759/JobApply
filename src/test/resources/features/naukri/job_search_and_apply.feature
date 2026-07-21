@@ -7,7 +7,7 @@ Feature: Resume Upload on Naukri
     Given I am logged into Naukri
 
   @regression @Job_01
-  Scenario: Upload new resume through profile section
+  Scenario: Upload new resume through profile section -
     When I navigate to my profile
     And I go to the resume section
     And I delete the old resume
