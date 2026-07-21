@@ -38,10 +38,10 @@ pipeline {
         stage('Build & Test') {
             steps {
                 script {
-                    def tag = readFile('Tag.txt').trim()
-                    echo "Tag from file = ${tag}"
+                    echo "Executing Tag : ${params.CUCUMBER_TAG}"
+
                     sh """
-                        mvn clean test -Dcucumber.filter.tags=${tag}
+                        mvn clean test -Dcucumber.filter.tags=${params.CUCUMBER_TAG}
                     """
                 }
             }

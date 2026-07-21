@@ -130,6 +130,13 @@
             <version>${junit-platform-suite.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Jakarta Mail for email reports -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -190,6 +197,39 @@
                     <reportVersion>2.29.0</reportVersion>
                     <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                     <reportDirectory>${project.build.directory}/allure-report</reportDirectory>
+                </configuration>
+            </plugin>
+
+            <!-- Exec plugin to trigger MailTrigger after tests -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>send-email-report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.naukri.automation.mail.MailTrigger</mainClass>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>build.status</key>
+                            <value>${build.status}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>build.url</key>
+                            <value>${build.url}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>header.color</key>
+                            <value>${header.color}</value>
+                        </systemProperty>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
