@@ -1,0 +1,148 @@
+pipeline {
+
+    agent any
+
+    triggers {
+        githubPush()
+    }
+
+    tools {
+        jdk 'java21'
+        maven 'maven3'
+    }
+
+    parameters {
+        string(
+            name: 'CUCUMBER_TAG',
+            defaultValue: '@Job_01',
+            description: 'Cucumber tag to execute'
+        )
+    }
+
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                echo '🧹 Cleaning workspace'
+                deleteDir()
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                echo '📥 Checkout source code'
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                script {
+                    def tag = readFile('Tag.txt').trim()
+                    echo "Tag from file = ${tag}"
+                    sh """
+                        mvn clean test -Dcucumber.filter.tags=${tag}
+                    """
+                }
+            }
+        }
+
+        stage('Generate Cucumber HTML Report') {
+            steps {
+                echo '📊 Generating Cucumber HTML report'
+            }
+        }
+
+        stage('Zip Cucumber HTML Report') {
+            steps {
+                echo '📦 Zipping Cucumber HTML report'
+                sh '''
+                REPORT_PATH="target/cucumber-reports/cucumber-html-reports"
+                ZIP_PATH="target/cucumber-reports/cucumber-html-reports.zip"
+                if [ -d "$REPORT_PATH" ]; then
+                    cd target/cucumber-reports
+                    zip -r cucumber-html-reports.zip cucumber-html-reports
+                    echo "✅ Cucumber HTML report zipped"
+                else
+                    echo "⚠️ Cucumber HTML report folder not found"
+                fi
+                '''
+            }
+        }
+    }
+
+    // ================= POST BLOCK =================
+    post {
+
+        always {
+
+            // ✅ Jenkins trend graph
+            junit allowEmptyResults: true,
+                  testResults: 'target/surefire-reports/*.xml'
+
+            // ✅ Publish Cucumber HTML Report
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/cucumber-reports/cucumber-html-reports',
+                reportFiles: 'overview-features.html',
+                reportName: 'Cucumber HTML Report',
+                useWrapper: false
+            ])
+
+            // ✅ MAIL + ZIP LOGIC
+            script {
+
+                echo '📦 Post block started (reports + mail)'
+
+                def buildStatus = currentBuild.currentResult
+                echo "🔔 Build Status : ${buildStatus}"
+
+                def headerColor = "#2ecc71"
+
+                if (buildStatus == "UNSTABLE") {
+                    headerColor = "#f1c40f"
+                }
+
+                if (buildStatus == "FAILURE") {
+                    headerColor = "#e74c3c"
+                }
+
+                // 🔹 Zip again (no risk)
+
+                catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+
+                    sh '''
+                    REPORT_PATH="target/cucumber-reports/cucumber-html-reports"
+
+                    if [ -d "$REPORT_PATH" ]; then
+                        cd target/cucumber-reports
+                        zip -r cucumber-html-reports.zip cucumber-html-reports
+                        echo "✅ Report zip ready for mail"
+                    else
+                        echo "⚠️ Report folder not found in post block"
+                    fi
+                    '''
+                }
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'gmail_cred',
+                        usernameVariable: 'SMTP_USER',
+                        passwordVariable: 'SMTP_PASS'
+                    )
+                ]) {
+
+                    sh """
+                        mvn exec:java \
+                        -Dexec.mainClass=com.test.robust.mail.MailTrigger \
+                        -Dbuild.status=${buildStatus} \
+                        -Dbuild.url=${env.BUILD_URL} \
+                        -Dheader.color=${headerColor}
+                    """
+                }
+            }
+        }
+    }
+}
