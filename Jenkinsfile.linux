@@ -47,6 +47,43 @@ pipeline {
             }
         }
 
+       stage('Build & Execute Tests') {
+
+           steps {
+
+               script {
+
+                   echo "======================================="
+                   echo "Executing Tag : ${params.CUCUMBER_TAG}"
+                   echo "======================================="
+
+                   withCredentials([
+                       usernamePassword(
+                           credentialsId: 'naukri-login',
+                           usernameVariable: 'NAUKRI_USERNAME',
+                           passwordVariable: 'NAUKRI_PASSWORD'
+                       )
+                   ]) {
+
+                       sh """
+                           mvn clean test \
+                           -Dtest=CucumberTestRunner \
+                           -Dcucumber.filter.tags=${params.CUCUMBER_TAG} \
+                           -Dbase.url=https://www.naukri.com \
+                           -Dnaukri.username=$NAUKRI_USERNAME \
+                           -Dnaukri.password=$NAUKRI_PASSWORD \
+                           -Dheadless=true \
+                           -f pom.xml
+                       """
+
+                   }
+
+               }
+
+           }
+
+       }
+
         stage('Generate Cucumber HTML Report') {
             steps {
                 echo '📊 Generating Cucumber HTML report'
