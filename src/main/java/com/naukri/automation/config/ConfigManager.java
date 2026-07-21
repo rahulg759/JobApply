@@ -128,7 +128,7 @@ public class ConfigManager {
         String url = resolve("NAUKRI_URL");
         System.out.println("DEBUG URL = " + url);
         return url;
-        return resolve("NAUKRI_URL");
+        //return resolve("NAUKRI_URL");
     }
 
     public String getEmail() {
