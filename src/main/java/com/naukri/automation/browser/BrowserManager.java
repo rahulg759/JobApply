@@ -36,7 +36,6 @@ public class BrowserManager {
         playwright = Playwright.create();
         BrowserConfig config = ConfigManager.getInstance().getBrowserConfig();
         browser = launchBrowser(config);
-        log.info("Browser '{}' launched successfully (headless: {})", config.browserType(), headless);
     }
 
     private Browser launchBrowser(BrowserConfig config) {
