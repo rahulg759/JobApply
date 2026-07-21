@@ -57,7 +57,7 @@ pipeline {
 
                   withCredentials([
                       usernamePassword(
-                          credentialsId: 'admin',
+                          credentialsId: 'gmail_cred',
                           usernameVariable: 'NAUKRI_EMAIL',
                           passwordVariable: 'NAUKRI_PASSWORD'
                       )
