@@ -55,13 +55,13 @@ pipeline {
 
                   echo "Executing Tag : ${params.CUCUMBER_TAG}"
 
-                  withCredentials([
-                      usernamePassword(
-                          credentialsId: 'gmail_cred',
-                          usernameVariable: 'NAUKRI_EMAIL',
-                          passwordVariable: 'NAUKRI_PASSWORD'
-                      )
-                  ]) {
+                 withCredentials([
+                     usernamePassword(
+                         credentialsId: 'naukri-login',
+                         usernameVariable: 'NAUKRI_EMAIL',
+                         passwordVariable: 'NAUKRI_PASSWORD'
+                     )
+                 ]){
 
                       sh """
                           mvn clean test \
