@@ -1,0 +1,31 @@
+# Environment
+.env
+
+# Build
+target/
+*.class
+*.jar
+*.war
+
+# Logs
+logs/
+*.log
+
+# Allure
+allure-results/
+allure-report/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Resume (user provided)
+resume.pdf
