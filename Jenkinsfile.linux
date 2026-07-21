@@ -41,7 +41,7 @@ pipeline {
                     echo "Executing Tag : ${params.CUCUMBER_TAG}"
 
                     sh """
-                        mvn clean test -Dcucumber.filter.tags=${params.CUCUMBER_TAG}
+                        mvn clean test -Dtest=CucumberTestRunner -Dcucumber.filter.tags=${params.CUCUMBER_TAG}  -f pom.xml
                     """
                 }
             }
