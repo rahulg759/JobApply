@@ -27,6 +27,10 @@ public class LoginPage extends BasePage {
     public LoginPage navigateToLogin() {
         String url = ConfigManager.getInstance().getNaukriUrl();
         log.info("Navigating to Naukri: {}", url);
+        if (url == null || url.isBlank()) {
+            throw new RuntimeException("Naukri URL is null or empty.");
+        }
+        log.info("Navigating to Naukri: {}", url);
         page.navigate(url);
         page.waitForLoadState(LoadState.NETWORKIDLE);
         wait.waitForPageLoad();

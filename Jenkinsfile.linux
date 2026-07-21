@@ -11,6 +11,10 @@ pipeline {
         maven 'maven3'
     }
 
+     environment {
+            BASE_URL = 'https://www.naukri.com'
+        }
+
     parameters {
         string(
             name: 'CUCUMBER_TAG',
