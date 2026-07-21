@@ -36,12 +36,16 @@ public class BrowserManager {
         playwright = Playwright.create();
         BrowserConfig config = ConfigManager.getInstance().getBrowserConfig();
         browser = launchBrowser(config);
-        log.info("Browser '{}' launched successfully (headless: {})", config.browserType(), config.headless());
+        log.info("Browser '{}' launched successfully (headless: {})", config.browserType(), headless);
     }
 
     private Browser launchBrowser(BrowserConfig config) {
+        boolean headless = Boolean.parseBoolean(
+                System.getProperty("headless", String.valueOf(config.headless()))
+        );
+
         var options = new com.microsoft.playwright.BrowserType.LaunchOptions()
-                .setHeadless(config.headless())
+                .setHeadless(headless)
                 .setSlowMo(config.slowMo());
 
         if (config.channel() != null && !config.channel().isEmpty()) {
