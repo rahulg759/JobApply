@@ -124,6 +124,10 @@ public class ConfigManager {
     }
 
     public String getNaukriUrl() {
+
+        String url = resolve("NAUKRI_URL");
+        System.out.println("DEBUG URL = " + url);
+        return url;
         return resolve("NAUKRI_URL");
     }
 
