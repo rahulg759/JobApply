@@ -51,34 +51,30 @@ pipeline {
 
            steps {
 
-               script {
+              script {
 
-                   echo "======================================="
-                   echo "Executing Tag : ${params.CUCUMBER_TAG}"
-                   echo "======================================="
+                  echo "Executing Tag : ${params.CUCUMBER_TAG}"
 
-                   withCredentials([
-                       usernamePassword(
-                           credentialsId: 'naukri-login',
-                           usernameVariable: 'NAUKRI_USERNAME',
-                           passwordVariable: 'NAUKRI_PASSWORD'
-                       )
-                   ]) {
+                  withCredentials([
+                      usernamePassword(
+                          credentialsId: 'admin',
+                          usernameVariable: 'NAUKRI_EMAIL',
+                          passwordVariable: 'NAUKRI_PASSWORD'
+                      )
+                  ]) {
 
-                       sh """
-                           mvn clean test \
-                           -Dtest=CucumberTestRunner \
-                           -Dcucumber.filter.tags=${params.CUCUMBER_TAG} \
-                           -Dbase.url=https://www.naukri.com \
-                           -Dnaukri.username=$NAUKRI_USERNAME \
-                           -Dnaukri.password=$NAUKRI_PASSWORD \
-                           -Dheadless=true \
-                           -f pom.xml
-                       """
-
-                   }
-
-               }
+                      sh """
+                          mvn clean test \
+                          -Dtest=CucumberTestRunner \
+                          -Dcucumber.filter.tags=${params.CUCUMBER_TAG} \
+                          -DNAUKRI_URL=https://www.naukri.com \
+                          -DNAUKRI_EMAIL=$NAUKRI_EMAIL \
+                          -DNAUKRI_PASSWORD=$NAUKRI_PASSWORD \
+                          -Dbrowser.headless=true \
+                          -f pom.xml
+                      """
+                  }
+              }
 
            }
 
