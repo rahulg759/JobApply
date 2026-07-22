@@ -56,7 +56,7 @@ public class Hooks {
     @AfterAll
     public static void afterAll() {
         if (browserManager != null) {
-           // browserManager.close();
+            browserManager.close();
             log.info("Browser manager closed after Cucumber suite");
         }
     }

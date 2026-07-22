@@ -29,7 +29,7 @@ public class BrowserManager {
     public void initialize() {
         if (playwright != null) {
             log.warn("BrowserManager already initialized. Closing previous instance first.");
-          //  close();
+              close();
         }
 
         log.info("Initializing Playwright...");
@@ -40,12 +40,26 @@ public class BrowserManager {
 
     private Browser launchBrowser(BrowserConfig config) {
         boolean headless = Boolean.parseBoolean(
-                System.getProperty("headless", String.valueOf(config.headless()))
+                System.getProperty(
+                        "browser.headless",
+                        System.getProperty(
+                                "headless",
+                                String.valueOf(config.headless())
+                        )
+                )
         );
+
 
         var options = new com.microsoft.playwright.BrowserType.LaunchOptions()
                 .setHeadless(headless)
-                .setSlowMo(config.slowMo());
+                .setSlowMo(config.slowMo())
+                .setArgs(List.of(
+                        "--disable-blink-features=AutomationControlled",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--no-sandbox",
+                        "--start-maximized"
+                ));
 
         if (config.channel() != null && !config.channel().isEmpty()) {
             options.setChannel(config.channel());
@@ -70,7 +84,12 @@ public class BrowserManager {
                 //.setViewportSize(config.getViewportWidth(), config.getViewportHeight())
                 .setViewportSize(config.getViewportWidth(), config.getViewportHeight())
                 .setLocale("en-IN")
-                .setPermissions(List.of("geolocation"));
+                .setPermissions(List.of("geolocation"))
+                .setUserAgent(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                                "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                                "Chrome/138.0.0.0 Safari/537.36"
+                );
 
         // Default to New Delhi if no coordinates provided
         if (latitude == null || longitude == null) {
@@ -90,7 +109,7 @@ public class BrowserManager {
         return createContext().newPage();
     }
 
-   /* public void close() {
+    public void close() {
         if (browser != null) {
             browser.close();
             browser = null;
@@ -100,5 +119,5 @@ public class BrowserManager {
             playwright = null;
         }
         log.info("BrowserManager closed successfully");
-    }*/
+    }
 }

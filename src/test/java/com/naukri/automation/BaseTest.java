@@ -50,7 +50,7 @@ public abstract class BaseTest {
     @AfterAll
     static void tearDownAll() {
         if (browserManager != null) {
-          //  browserManager.close();
+            browserManager.close();
             log.info("Browser manager closed");
         }
     }
