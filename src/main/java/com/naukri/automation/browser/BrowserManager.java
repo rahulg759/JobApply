@@ -67,6 +67,7 @@ public class BrowserManager {
         }
         ConfigManager config = ConfigManager.getInstance();
         var options = new Browser.NewContextOptions()
+                //.setViewportSize(config.getViewportWidth(), config.getViewportHeight())
                 .setViewportSize(config.getViewportWidth(), config.getViewportHeight())
                 .setLocale("en-IN")
                 .setPermissions(List.of("geolocation"));

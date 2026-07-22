@@ -3,6 +3,7 @@ package com.naukri.automation.pages;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import com.naukri.automation.config.ConfigManager;
 import com.naukri.automation.utils.ScreenshotHelper;
 
@@ -62,6 +63,38 @@ public class LoginPage extends BasePage {
         return this;
     }
 
+
+    public LoginPage clickLoginButton1() {
+        log.info("Clicking login button in header");
+
+        String[] selectors = {
+                "a[title='Login']",
+                "a:has-text('Login')",
+                "//a[contains(@title,'Login')]"
+        };
+
+        for (String selector : selectors) {
+            try {
+                Locator btn = page.locator(selector).first();
+
+                btn.waitFor(new Locator.WaitForOptions()
+                        .setState(WaitForSelectorState.VISIBLE)
+                        .setTimeout(10000));
+
+                btn.click();
+
+                log.info("Clicked login using selector: {}", selector);
+                return this;
+
+            } catch (Exception e) {
+                log.warn("Selector failed: {}", selector);
+            }
+        }
+
+        ScreenshotHelper.capture(page, "login_button_not_found");
+        throw new RuntimeException("Login button not found");
+    }
+
     public LoginPage switchToEmailTab() {
         if (emailTab.isVisible()) {
             log.info("Switching to email login tab");
@@ -92,7 +125,7 @@ public class LoginPage extends BasePage {
 
     public HomePage login(String email, String password) {
         navigateToLogin()
-                .clickLoginButton()
+                .clickLoginButton1()
                 .switchToEmailTab()
                 .enterEmail(email)
                 .enterPassword(password)
